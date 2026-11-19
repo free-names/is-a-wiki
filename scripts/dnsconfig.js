@@ -62,7 +62,11 @@ function getDomainsList(filesPath) {
 // ---------------------------------------------------------------------------
 
 var domains = getDomainsList('../domains');
-var records = [];
+
+// Catch-all that sends unregistered names to free-names.org/available
+var records = [
+  AAAA("*", "100::", proxy.on)
+];
 
 for (var idx in domains) {
   var name = domains[idx].name;
@@ -162,9 +166,20 @@ for (var idx in domains) {
 // ---------------------------------------------------------------------------
 // commit
 //
-// NO_PURGE: DNSControl adds and updates records, but never deletes.
-// Removing a domains/*.json will NOT remove the DNS record - do that by hand
-// in the Cloudflare dashboard.
+// PURGE: the zone matches domains/*.json, so removing a file removes its
+// records. Anything listed in IGNORE below is left alone.
 // ---------------------------------------------------------------------------
 
-D(rootDomain, regNone, providerCf, NO_PURGE, records);
+D(
+  rootDomain,
+  regNone,
+  providerCf,
+  PURGE,
+  records,
+
+  // The apex is managed by hand in Cloudflare (proxied, redirects to free-names.org)
+  IGNORE("@"),
+
+  // DMARC policy is managed by hand in Cloudflare
+  IGNORE("_dmarc")
+);

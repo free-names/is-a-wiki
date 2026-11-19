@@ -1,0 +1,10 @@
+{
+    "description": "example",
+    "owner": {
+        "email": "",
+        "username": "FuFuUwU"
+    },
+    "records": {
+        "CNAME": "bwah.dev"
+    }
+}
